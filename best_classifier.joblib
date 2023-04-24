@@ -1,0 +1,21 @@
+rfc = RandomForestClassifier()
+
+kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Using BayesSearchCV optimization instead of GridSearchCV
+bayes_search = BayesSearchCV(
+    estimator=rfc, 
+    search_spaces=params, 
+    n_iter=10, 
+    cv=kfold, 
+    n_jobs=-1, 
+    scoring='accuracy'
+)
+bayes_search.fit(X_train, y_train)
+
+best_clf = bayes_search.best_estimator_
+best_clf.fit(X_train, y_train)
+
+# Evaluating the Random forest classifier using cross-validation
+cv_scores = cross_val_score(best_clf, X_train, y_train, cv=kfold, scoring='accuracy')
+cv_mean_score = np.mean(cv_scores)
